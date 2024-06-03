@@ -872,7 +872,7 @@ def get_boosts(toot, instance, auth_dict):
 def collect_timeline_apidirect(dbconnection, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
                             keywords=[], textprocessor=None, savedir="/tmp/", 
-                            instance_name=None, auth_dict=None):
+                            instance_name=None, auth_dict=None, cutoff_date="2023-12-02"):
     """collect_timeline_apidirect : retrieves the public timeline of an instance and stores toots, users and hashtags
 
     Args:
@@ -953,7 +953,8 @@ def collect_timeline_apidirect(dbconnection, url=None, local=False, remote=False
             logging.error("Check request...")
             break
         filtered_toots, collected_tags, collected_users = \
-                    collect_toots_and_tooters_apidirect(dbconnection, r, keywords, textprocessor, instance_name=instance_name)
+                    collect_toots_and_tooters_apidirect(dbconnection, r, keywords, textprocessor, 
+                                                        instance_name=instance_name, auth_dict=auth_dict, cutoff_date=cutoff_date)
         save2json_apidirect(filtered_toots, collected_tags, collected_users, [], [], [],
                             "{}".format(savedir))
         

@@ -87,13 +87,13 @@ if __name__ == "__main__":
         if parallel:
             process = multiprocessing.Process(target=collect_timeline_apidirect, args=(dbconnection, apibaseurl, 
                                                 False, False, False, max_id_snowflake, min_id_snowflake, None, 40, 
-                                                [], None, DIR_out, server, auth_dict))
+                                                [], None, DIR_out, server, auth_dict, "2023-12-02"))
             processes.append(process)        
             process.start()              
         else:
-            res = collect_timeline_apidirect(url=apibaseurl, max_id=max_id_snowflake, since_id=min_id_snowflake, 
-                                             savedir=DIR_out, instance_name=server, auth_dict=auth_dict)                
-        time.sleep(3000)
+            res = collect_timeline_apidirect(dbconnection=dbconnection, url=apibaseurl, max_id=max_id_snowflake, since_id=min_id_snowflake, 
+                                             savedir=DIR_out, instance_name=server, auth_dict=auth_dict, cutoff_date="2023-12-02")                
+        time.sleep(300)
     if parallel:
         for process in processes:
             process.join()  
