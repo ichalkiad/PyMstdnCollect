@@ -91,7 +91,7 @@ if __name__ == "__main__":
             processes.append(process)        
             process.start()              
         else:
-            res = collect_timeline_apidirect(url=apibaseurl, max_id=max_id_snowflake, since_id=min_id_snowflake, 
+            res = collect_timeline_apidirect(dbconnection, url=apibaseurl, max_id=max_id_snowflake, since_id=min_id_snowflake, 
                                              savedir=DIR_out, instance_name=server, auth_dict=auth_dict)                
         time.sleep(300)
     if parallel:
