@@ -8,7 +8,7 @@ import pathlib
 import pytz
 from bs4 import BeautifulSoup
 import jsonlines
-from utils import collect_all_tags, collect_all_users, \
+from pymstdncollect.src.utils import collect_all_tags, collect_all_users, \
     datetime2snowflake, datetime4json, collect_toots_and_tooters_apidirect, \
         save2json_apidirect, collect_hashtag_interactions_apidirect, \
             get_conversation_from_head, get_boosts, execute_update_context_sql, \

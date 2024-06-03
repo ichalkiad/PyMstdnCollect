@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 import time 
 import pathlib 
 import pytz
-from mstdncollect.src.utils import connectTo_weekly_toots_db, \
+from pymstdncollect.src.utils import connectTo_weekly_toots_db, \
     daily_collection_hashtags_users, collect_users_activity_stats, \
         collect_user_postingactivity_apidirect, get_boosts, execute_insert_sql,\
         execute_update_reblogging_sql, execute_update_reblogging_counts_sql, \
@@ -12,8 +12,8 @@ from mstdncollect.src.utils import connectTo_weekly_toots_db, \
         load_keywords_topic_lists, datetime2snowflake, execute_create_sql, collect_hashtag_interactions_apidirect,\
         save2json_apidirect, get_outbox_from_user, get_toot_from_statusid, get_parent_toot, collect_toots_and_tooters_apidirect,\
         collect_user_followers_apidirect, get_user_id_from_username
-from mstdncollect.src.weekly_postcollection import connectTo_weekly_toots_db, weekly_toots_postcollection, weekly_users_postcollection
-from mstdncollect.src.hashtags_contexts_collection import collect_timeline_hashtag_apidirect 
+from pymstdncollect.src.weekly_postcollection import connectTo_weekly_toots_db, weekly_toots_postcollection, weekly_users_postcollection
+from pymstdncollect.src.hashtags_contexts_collection import collect_timeline_hashtag_apidirect 
 import logging
 import pandas as pd
 import numpy as np 

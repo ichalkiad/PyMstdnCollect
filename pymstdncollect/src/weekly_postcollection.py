@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 import time 
 import pathlib 
 import pytz
-from utils import connectTo_weekly_toots_db, \
+from pymstdncollect.src.utils import connectTo_weekly_toots_db, \
     daily_collection_hashtags_users, collect_users_activity_stats, \
         collect_user_postingactivity_apidirect, get_boosts, execute_insert_sql,\
         execute_update_reblogging_sql, execute_update_reblogging_counts_sql, \

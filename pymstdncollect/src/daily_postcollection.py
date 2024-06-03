@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 import time 
 import pathlib 
 import pytz
-from utils import connectTo_weekly_toots_db, execute_create_sql, daily_collection_hashtags_users
+from pymstdncollect.src.utils import connectTo_weekly_toots_db, execute_create_sql, daily_collection_hashtags_users
 import logging
 import multiprocessing
 import sqlite3
