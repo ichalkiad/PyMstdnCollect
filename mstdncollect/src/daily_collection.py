@@ -17,7 +17,7 @@ if __name__ == "__main__":
     # export clientsecret=L_pXSXoKFjLqlzO1fDuZP-Pm2Y1KanayD9Y1JYF3V6I
     # export accesstoken=Bp0piIKgU7Yjyih1Y8tMeiOtCqT_mGAMTTjSsU83LYU
     parallel = False
-    with open("./authorisations/auth_dict.json", "r") as f:
+    with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
         auth_dict = json.load(f)    
    
     # timestamp = datetime.now(timezone.utc) - timedelta(days=1)
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         else:
             res = collect_timeline_apidirect(url=apibaseurl, max_id=max_id_snowflake, since_id=min_id_snowflake, 
                                              savedir=DIR_out, instance_name=server, auth_dict=auth_dict)                
-        time.sleep(3000)
+        time.sleep(300)
     if parallel:
         for process in processes:
             process.join()  
