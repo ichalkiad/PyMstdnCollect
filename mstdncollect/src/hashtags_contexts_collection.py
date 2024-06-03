@@ -207,7 +207,7 @@ if __name__ == "__main__":
         auth_dict = json.load(f)    
     topics = ["climatechange", "epidemics", "immigration"]
 
-    upperend = pd.Timestamp("2024-01-23") # datetime.now(timezone.utc) 
+    upperend = pd.Timestamp("2024-02-14") # datetime.now(timezone.utc) 
     # upperend = upperend - timedelta(days=15) # as per David: collect past 72h-48h intervals so that we have "favorited post" information 
     max_id_snowflake = datetime2snowflake(upperend)
     timestamp = upperend - timedelta(days=7)
