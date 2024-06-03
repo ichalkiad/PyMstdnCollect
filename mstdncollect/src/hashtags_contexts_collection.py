@@ -25,7 +25,7 @@ from treelib import Node, Tree
 def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
                             keywords=[], textprocessor=None, savedir="/tmp/", 
-                            instance_name=None, allcollectedhashtags=[], print_tree=False, dbconn=None, auth_dict=None):
+                            instance_name=None, allcollectedhashtags=[], print_tree=False, dbconn=None, auth_dict=None, cutoff_date="2023-12-02"):
     """collect_timeline_hashtag_apidirect 
 
     Collects timelines and conversation data based on 
@@ -138,7 +138,7 @@ def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remo
                             monthyear = pd.Timestamp(np.datetime64(idesc["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                         except:
                             monthyear = pd.Timestamp(np.datetime64(idesc["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                    if monthyear < pd.Timestamp("2023-12-02").tz_localize("Europe/Paris").astimezone(pytz.utc):
+                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
                         # do not collect it
                         continue 
 

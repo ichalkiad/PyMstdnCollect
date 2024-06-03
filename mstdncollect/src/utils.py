@@ -24,7 +24,7 @@ from collections import Counter
 # directory organisation
 ###################################
 
-def parse_directories_updsavestructure4(sourcedir, targetdir, dbconn=None, auth_dict=None):
+def parse_directories_updsavestructure4(sourcedir, targetdir, dbconn=None, auth_dict=None, cutoff_date="2023-12-02"):
     # change head directory structure to toots/year/month/toots.jsonl
     monthsint = {"Jan":1, "Feb":2, "Mar":3, "Apr":4, "May":5, "Jun":6, "Jul":7, "Aug":8, "Sep":9, "Oct":10, "Nov":11, "Dec":12}
     i = 0 
@@ -69,7 +69,7 @@ def parse_directories_updsavestructure4(sourcedir, targetdir, dbconn=None, auth_
                             monthyear = pd.Timestamp(np.datetime64(data["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                         except:
                             monthyear = pd.Timestamp(np.datetime64(data["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                    if monthyear < pd.Timestamp("2023-12-02").tz_localize("Europe/Paris").astimezone(pytz.utc):
+                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
                         continue
                     if dbconn is not None:
                         newrow = build_db_row(data)        
@@ -95,7 +95,7 @@ def parse_directories_updsavestructure4(sourcedir, targetdir, dbconn=None, auth_
                                         monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                                     except:
                                         monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                                if monthyear < pd.Timestamp("2023-12-02").tz_localize("Europe/Paris").astimezone(pytz.utc):
+                                if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
                                     # do not collect it
                                     raise AttributeError
                                 parenttoot["account"] = add_unique_account_id(parenttoot["account"], data["instance_name"])
@@ -462,7 +462,7 @@ def collect_hashtag_interactions_apidirect(res, instance_name):
 # data collection for user posts
 ###################################
 
-def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tmp/", auth_dict=None):
+def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tmp/", auth_dict=None, cutoff_date="2023-12-02"):
 
     fetched_toots = get_outbox_from_user(useracct, instance_name, auth_dict)
     if fetched_toots is None:
@@ -497,7 +497,7 @@ def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tm
                 
                 print(monthyear)
 
-        if monthyear < pd.Timestamp("2023-12-02").tz_localize("Europe/Paris").astimezone(pytz.utc):
+        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
             # do not collect it
             continue
         i["instance_name"] = tootinstance
@@ -970,7 +970,7 @@ def collect_timeline_apidirect(dbconnection, url=None, local=False, remote=False
 
     return r
 
-def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, instance_name, auth_dict):
+def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, instance_name, auth_dict, cutoff_date="2023-12-02"):
     """collect_toots_and_tooters_apidirect : 
     
     Collects NON-BOT generated, PUBLIC toots and extends the toot 
@@ -1076,7 +1076,7 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
                             monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                         except:
                             monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                    if monthyear < pd.Timestamp("2023-12-02").tz_localize("Europe/Paris").astimezone(pytz.utc):
+                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
                         # do not collect it
                         raise AttributeError
                     parenttoot["account"] = add_unique_account_id(parenttoot["account"], i["instance_name"])
@@ -1759,7 +1759,7 @@ def retrieve_toot_from_id_in_toots_list(tootid, tootsinteractionlist):
             return i
     return None
 
-def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_dict):
+def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_dict, cutoff_date="2023-12-02"):
     # iterate over replies list, build unique ids from URIs and insert in DB
     updreplies = [headtoot]
     for replyidx in range(len(repliestoot)):
@@ -1825,7 +1825,7 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
             except:
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-        if monthyear < pd.Timestamp("2023-12-02").tz_localize("Europe/Paris").astimezone(pytz.utc):
+        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
             # do not collect it, in_reply_to_id field of reply remains unchanged
             continue
         parentglobalID = parenttoot["globalID"]
