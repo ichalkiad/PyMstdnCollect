@@ -1,10 +1,11 @@
 import ipdb
-import os
 from datetime import datetime, timezone, timedelta
 import time 
 import pathlib 
 import pytz
-from pymstdncollect.src.utils import datetime2snowflake, collect_timeline_apidirect, connectTo_weekly_toots_db, execute_create_sql
+from pymstdncollect.src.utils import datetime2snowflake 
+from pymstdncollect.src.toots import collect_timeline_apidirect
+from pymstdncollect.src.db import connectTo_weekly_toots_db, execute_create_sql 
 import logging
 import multiprocessing
 import json

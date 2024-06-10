@@ -1,14 +1,8 @@
 import ipdb
-import os
 from datetime import datetime, timezone, timedelta
-import time 
-import pathlib 
-import pytz
-from pymstdncollect.src.utils import connectTo_weekly_toots_db, execute_create_sql, daily_collection_hashtags_users
-import logging
-import multiprocessing
-import sqlite3
-from sqlite3 import Error
+from pymstdncollect.src.toots import daily_collection_hashtags_users
+from pymstdncollect.src.db import connectTo_weekly_toots_db, execute_create_sql 
+
 
 if __name__ == "__main__":
 

@@ -1,25 +1,22 @@
 import ipdb
-import os
 from datetime import datetime, timezone, timedelta
 import time 
 import pathlib 
-import pytz
-from pymstdncollect.src.utils import connectTo_weekly_toots_db, \
-    daily_collection_hashtags_users, collect_users_activity_stats, \
-        collect_user_postingactivity_apidirect, get_boosts, execute_insert_sql,\
-        execute_update_reblogging_sql, execute_update_reblogging_counts_sql, \
-        get_conversation_from_head, execute_update_context_sql, build_db_row, \
-        load_keywords_topic_lists, datetime2snowflake, execute_create_sql, collect_hashtag_interactions_apidirect,\
-        save2json_apidirect, get_outbox_from_user, get_toot_from_statusid, get_parent_toot, collect_toots_and_tooters_apidirect,\
-        collect_user_followers_apidirect, get_user_id_from_username
-from pymstdncollect.src.weekly_postcollection import connectTo_weekly_toots_db, weekly_toots_postcollection, weekly_users_postcollection
-from pymstdncollect.src.hashtags_contexts_collection import collect_timeline_hashtag_apidirect 
+from pymstdncollect.user_scripts.weekly_postcollection import connectTo_weekly_toots_db, weekly_toots_postcollection, \
+                                                                weekly_users_postcollection
+from pymstdncollect.user_scripts.hashtags_contexts_collection import collect_timeline_hashtag_apidirect 
+from pymstdncollect.src.utils import datetime2snowflake, save2json_apidirect, get_toot_from_statusid, \
+                                        get_user_id_from_username
+from pymstdncollect.src.db import connectTo_weekly_toots_db, execute_create_sql 
+from pymstdncollect.src.interactions import get_conversation_from_head, get_boosts, get_outbox_from_user, \
+                                                get_parent_toot, collect_user_followers_apidirect
+from pymstdncollect.src.toots import collect_hashtag_interactions_apidirect, \
+                                        collect_user_postingactivity_apidirect, \
+                                            daily_collection_hashtags_users, collect_toots_and_tooters_apidirect
 import logging
-import pandas as pd
-import numpy as np 
 import json
 import requests
-from treelib import Node, Tree
+from treelib import Tree
 
 if __name__ == "__main__":
 
@@ -28,9 +25,9 @@ if __name__ == "__main__":
     with open("../../authorisations/auth_dict.json", "r") as f:
         auth_dict = json.load(f)    
     
-    topics = ["climatechange", "epidemics", "immigration"]
+    topics = ["epidemics"]
     hashtag_lists_dir = "./collection_hashtags/"
-    topic_lists_dir = "./topiclists_iscpif/"
+    topic_lists_dir = "./topiclists/"
     
     
     upperend = datetime.now(timezone.utc) 

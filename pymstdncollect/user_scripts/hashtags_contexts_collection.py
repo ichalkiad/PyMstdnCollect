@@ -2,25 +2,20 @@ import json
 import requests
 import pandas as pd
 import ipdb
-import os
 import time 
 import pathlib 
 import pytz
-from bs4 import BeautifulSoup
-import jsonlines
-from pymstdncollect.src.utils import collect_all_tags, collect_all_users, \
-    datetime2snowflake, datetime4json, collect_toots_and_tooters_apidirect, \
-        save2json_apidirect, collect_hashtag_interactions_apidirect, \
-            get_conversation_from_head, get_boosts, execute_update_context_sql, \
-            execute_update_reblogging_counts_sql, execute_update_replies_sql, execute_update_reblogging_sql, \
-            connectTo_weekly_toots_db, execute_create_sql
-import sys
+from pymstdncollect.src.utils import datetime2snowflake, save2json_apidirect
+from pymstdncollect.src.interactions import get_conversation_from_head, get_boosts 
+from pymstdncollect.src.toots import collect_hashtag_interactions_apidirect
+from pymstdncollect.src.db import execute_update_context_sql, \
+                                    execute_update_reblogging_counts_sql, execute_update_reblogging_sql, \
+                                        connectTo_weekly_toots_db, execute_create_sql
 import logging
-import multiprocessing
-from datetime import datetime, timezone, timedelta
+from datetime import timedelta
 from collections import Counter
 import numpy as np
-from treelib import Node, Tree
+from treelib import Tree
 
 def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
