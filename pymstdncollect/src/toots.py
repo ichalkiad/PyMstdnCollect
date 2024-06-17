@@ -236,7 +236,6 @@ def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tm
                         i[kk][kkk] = i[kk][kkk].strftime("%Y-%m-%dT%H:%M:%S") 
         save2json_apidirect(filtered_toots, collected_tags, [], [], [], [],
                         "{}".format(savedir))
-
     return filtered_toots, collected_tags
 
 def collect_users_activity_stats(input_dir, years=[], months=[]):
