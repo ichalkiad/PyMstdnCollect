@@ -142,7 +142,7 @@ def daily_collection_hashtags_users(toot_dir, hashtag_lists_dir, topics, topic_l
         if len(topichashtags) > 0:
             hashtagscnts = Counter(topichashtags)
             hashtagscntsval = [*hashtagscnts.values()]
-            tophst = np.percentile(hashtagscntsval, 95, interpolation="higher")
+            tophst = np.percentile(hashtagscntsval, 95, method="higher")
             newtopichashtags = [i for i in hashtagscnts.keys() if hashtagscnts[i] >= tophst]
             print(newtopichashtags)
             if pathlib.Path("{}/{}_hashtags_upd.csv".format(hashtag_lists_dir, hashtagkey)).exists():
