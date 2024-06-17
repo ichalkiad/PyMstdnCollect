@@ -7,3 +7,11 @@ addopts = "--cov=pymstdncollect --cov-report=html --cov-config=.coveragerc --imp
 testpaths = [
     "test",
 ]
+
+classifiers = [
+  "Intended Audience :: Researchers, Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10"
+]
