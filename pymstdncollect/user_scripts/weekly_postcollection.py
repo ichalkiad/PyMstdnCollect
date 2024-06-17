@@ -39,7 +39,7 @@ def weekly_users_postcollection(sourcedir, mindate, maxdate, dbconn=None, outdir
     months = [f.name for m in years for f in os.scandir("{}/toots/{}/".format(sourcedir, m)) if f.is_dir()]     
     usersactivity = collect_users_activity_stats(sourcedir, years=years, months=months)    
     # 95th percentile of user activity in number of posts
-    topactivity = np.percentile(usersactivity.statuses.values, 95, interpolation="higher")
+    topactivity = np.percentile(usersactivity.statuses.values, 95, method="higher")
     topusers = usersactivity.loc[usersactivity.statuses >= topactivity]
     topusers = topusers.drop_duplicates(["acct"]).reset_index(drop=True)
     if len(topusers) > 10:
