@@ -205,20 +205,13 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
             parenttoot = get_toot_from_statusid(reply["in_reply_to_id"], headtoot["instance_name"], auth_dict=auth_dict)
             if parenttoot is None:
                 continue
-            else:                   
-                if "edited_at" in parenttoot.keys() and parenttoot["edited_at"] is not None:     
-                    if "Z" in parenttoot["edited_at"]:
-                        parenttoot["edited_at"] = parenttoot["edited_at"][:-5]
-                if "Z" in parenttoot["created_at"]:
-                    parenttoot["created_at"] = parenttoot["created_at"][:-5]            
+            else:                        
                 toot = BeautifulSoup(parenttoot["content"], "html.parser")
                 parenttoot["instance_name"] = headtoot["instance_name"]
                 toottext = toot.get_text()
                 parenttoot["toottext"] = toottext
                 acc = add_unique_account_id(parenttoot["account"], parenttoot["instance_name"])
                 parenttoot["account"] = acc
-                if "Z" in parenttoot["account"]["created_at"]:
-                    parenttoot["account"]["created_at"] = parenttoot["account"]["created_at"][:-5]   
                 parenttoot = add_unique_toot_id(parenttoot, parenttoot["instance_name"])
                 parenttoot["rebloggedbyuser"] = []
                 if isinstance(parenttoot["spoiler_text"], str) and len(parenttoot["spoiler_text"]) > 0:
@@ -232,6 +225,13 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
                     execute_insert_sql(dbconnection, "toots", parentrow)
                 else:
                     print(parentrow)
+        if "edited_at" in parenttoot.keys() and parenttoot["edited_at"] is not None:     
+            if "Z" in parenttoot["edited_at"]:
+                parenttoot["edited_at"] = parenttoot["edited_at"][:-5]
+        if "Z" in parenttoot["created_at"]:
+            parenttoot["created_at"] = parenttoot["created_at"][:-5]   
+        if "Z" in parenttoot["account"]["created_at"]:
+            parenttoot["account"]["created_at"] = parenttoot["account"]["created_at"][:-5]   
         if "edited_at" in parenttoot.keys() and parenttoot["edited_at"] is not None and parenttoot["edited_at"] != "":
             try:
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["edited_at"])).tz_localize("CET").astimezone(pytz.utc)
