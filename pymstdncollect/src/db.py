@@ -166,7 +166,12 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
     # iterate over replies list, build unique ids from URIs and insert in DB
     updreplies = [headtoot]
     for replyidx in range(len(repliestoot)):
-        reply = repliestoot[replyidx]
+        reply = repliestoot[replyidx]  
+        if "edited_at" in reply.keys() and reply["edited_at"] is not None:     
+            if "Z" in reply["edited_at"]:
+                reply["edited_at"] = reply["edited_at"][:-5]
+        if "Z" in reply["created_at"]:
+            reply["created_at"] = reply["created_at"][:-5]           
         # extract toot text content
         toot = BeautifulSoup(reply["content"], "html.parser")
         # add extra entry in toot with Mastodon instance name
@@ -176,6 +181,8 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
         reply["toottext"] = toottext
         acc = add_unique_account_id(reply["account"], reply["instance_name"])
         reply["account"] = acc
+        if "Z" in reply["account"]["created_at"]:
+            reply["account"]["created_at"] = reply["account"]["created_at"][:-5]     
         reply = add_unique_toot_id(reply, reply["instance_name"])
         reply["rebloggedbyuser"] = []
         if isinstance(reply["spoiler_text"], str) and len(reply["spoiler_text"]) > 0:
@@ -198,13 +205,20 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
             parenttoot = get_toot_from_statusid(reply["in_reply_to_id"], headtoot["instance_name"], auth_dict=auth_dict)
             if parenttoot is None:
                 continue
-            else:
+            else:                   
+                if "edited_at" in parenttoot.keys() and parenttoot["edited_at"] is not None:     
+                    if "Z" in parenttoot["edited_at"]:
+                        parenttoot["edited_at"] = parenttoot["edited_at"][:-5]
+                if "Z" in parenttoot["created_at"]:
+                    parenttoot["created_at"] = parenttoot["created_at"][:-5]            
                 toot = BeautifulSoup(parenttoot["content"], "html.parser")
                 parenttoot["instance_name"] = headtoot["instance_name"]
                 toottext = toot.get_text()
                 parenttoot["toottext"] = toottext
                 acc = add_unique_account_id(parenttoot["account"], parenttoot["instance_name"])
                 parenttoot["account"] = acc
+                if "Z" in parenttoot["account"]["created_at"]:
+                    parenttoot["account"]["created_at"] = parenttoot["account"]["created_at"][:-5]   
                 parenttoot = add_unique_toot_id(parenttoot, parenttoot["instance_name"])
                 parenttoot["rebloggedbyuser"] = []
                 if isinstance(parenttoot["spoiler_text"], str) and len(parenttoot["spoiler_text"]) > 0:

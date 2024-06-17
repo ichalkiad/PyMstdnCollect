@@ -60,7 +60,16 @@ def collect_hashtag_interactions_apidirect(res, instance_name):
                 i["account"]["account_note_text"] = accountnote.get_text()
             # add extra entry in toot dictionary
             toottext = toot.get_text()            
-            i["toottext"] = toottext            
+            i["toottext"] = toottext   
+            
+            if "edited_at" in i.keys() and i["edited_at"] is not None:     
+                if "Z" in i["edited_at"]:
+                    i["edited_at"] = i["edited_at"][:-5]
+            if "Z" in i["created_at"]:
+                i["created_at"] = i["created_at"][:-5]        
+            if "Z" in i["account"]["created_at"]:
+                i["account"]["created_at"] = i["account"]["created_at"][:-5]    
+        
             filtered_toots.append(i)                    
             for kk in i.keys():
                 if isinstance(i[kk], datetime):
@@ -71,9 +80,6 @@ def collect_hashtag_interactions_apidirect(res, instance_name):
                         if isinstance(i[kk][kkk], datetime):
                             i[kk][kkk] = i[kk][kkk].astimezone(pytz.utc)
                             i[kk][kkk] = i[kk][kkk].strftime("%Y-%m-%dT%H:%M:%S") 
-            
-            # identify heads of conversations and get their full context and their reblogs
-        # collect dominant hashtags
 
         return filtered_toots, collected_tags, collected_users 
 
@@ -174,6 +180,11 @@ def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tm
             continue
         if i["visibility"] != "public":
             continue
+        if "edited_at" in i.keys() and i["edited_at"] is not None:     
+            if "Z" in i["edited_at"]:
+                i["edited_at"] = i["edited_at"][:-5]
+        if "Z" in i["created_at"]:
+            i["created_at"] = i["created_at"][:-5]               
         if "edited_at" in i.keys() and i["edited_at"] is not None and i["edited_at"] != "":
             try:
                 monthyear = pd.Timestamp(np.datetime64(i["edited_at"])).tz_localize("CET").astimezone(pytz.utc)
@@ -193,6 +204,8 @@ def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tm
         i["instance_name"] = tootinstance
         acc = add_unique_account_id(i["account"], tootinstance)
         i["account"] = acc
+        if "Z" in i["account"]["created_at"]:
+            i["account"]["created_at"] = i["account"]["created_at"][:-5] 
         i = add_unique_toot_id(i, tootinstance)
         i["rebloggedbyuser"] = []
         # extract tags
@@ -397,6 +410,13 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
             continue
         if i["visibility"] != "public":
             continue
+        if "edited_at" in i.keys() and i["edited_at"] is not None:     
+            if "Z" in i["edited_at"]:
+                i["edited_at"] = i["edited_at"][:-5]
+        if "Z" in i["created_at"]:
+            i["created_at"] = i["created_at"][:-5]        
+        if "Z" in i["account"]["created_at"]:
+            i["account"]["created_at"] = i["account"]["created_at"][:-5]     
         # extract tags
         if len(i["tags"]) > 0:
             for ktag in i["tags"]:
@@ -417,6 +437,8 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
         i["toottext"] = toottext
         acc = add_unique_account_id(i["account"], i["instance_name"])
         i["account"] = acc
+        if "Z" in i["account"]["created_at"]:
+            i["account"]["created_at"] = i["account"]["created_at"][:-5]    
         i = add_unique_toot_id(i, i["instance_name"])
         i["rebloggedbyuser"] = []
         if isinstance(i["spoiler_text"], str) and len(i["spoiler_text"]) > 0:
@@ -445,7 +467,6 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
                     if isinstance(i[kk][kkk], datetime):
                         i[kk][kkk] = i[kk][kkk].astimezone(pytz.utc)
                         i[kk][kkk] = i[kk][kkk].strftime("%Y-%m-%dT%H:%M:%S") 
-        # print(i["created_at"], datetime2snowflake(pd.to_datetime(pd.Timestamp(np.datetime64(i["created_at"])))))
         if dbconn is not None:
             newrow = build_db_row(i)        
             if newrow is not None:            
@@ -460,6 +481,15 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
                 # get immediate parent
                 if ancestors is not None:
                     parenttoot = add_unique_toot_id(ancestors[-1], i["instance_name"])
+                    
+                    if "edited_at" in parenttoot.keys() and parenttoot["edited_at"] is not None:     
+                        if "Z" in parenttoot["edited_at"]:
+                            parenttoot["edited_at"] = parenttoot["edited_at"][:-5]
+                    if "Z" in parenttoot["created_at"]:
+                        parenttoot["created_at"] = parenttoot["created_at"][:-5]        
+                    if "Z" in parenttoot["account"]["created_at"]:
+                        parenttoot["account"]["created_at"] = parenttoot["account"]["created_at"][:-5]     
+
                     if "edited_at" in parenttoot.keys() and parenttoot["edited_at"] is not None and parenttoot["edited_at"] != "":
                         try:
                             monthyear = pd.Timestamp(np.datetime64(parenttoot["edited_at"])).tz_localize("CET").astimezone(pytz.utc)

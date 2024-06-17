@@ -122,7 +122,15 @@ def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remo
                     # keep public posts                
                     if idesc["visibility"] != "public":
                         continue   
-
+                        
+                    if "edited_at" in idesc.keys() and idesc["edited_at"] is not None:     
+                        if "Z" in idesc["edited_at"]:
+                            idesc["edited_at"] = idesc["edited_at"][:-5]
+                    if "Z" in idesc["created_at"]:
+                        idesc["created_at"] = idesc["created_at"][:-5]        
+                    if "Z" in idesc["account"]["created_at"]:
+                        idesc["account"]["created_at"] = idesc["account"]["created_at"][:-5]    
+        
                     if "edited_at" in idesc.keys() and idesc["edited_at"] is not None and idesc["edited_at"] != "":
                         try:
                             monthyear = pd.Timestamp(np.datetime64(idesc["edited_at"])).tz_localize("CET").astimezone(pytz.utc)

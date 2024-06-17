@@ -292,7 +292,11 @@ def collect_user_followers_apidirect(res, usr_id, keywords, textprocessor, insta
     print("Fetched {} followers of user {}...".format(len(fetched_followers), usr_id))
     
     followers  = []
-    for i in fetched_followers:       
+    for i in fetched_followers:  
+
+        if "Z" in i["created_at"]:
+            i["created_at"] = i["created_at"][:-5]             
+    
         for kk in i.keys():
             if isinstance(i[kk], datetime):
                 i[kk] = i[kk].astimezone(pytz.utc)
@@ -302,7 +306,6 @@ def collect_user_followers_apidirect(res, usr_id, keywords, textprocessor, insta
                     if isinstance(i[kk][kkk], datetime):
                         i[kk][kkk] = i[kk][kkk].astimezone(pytz.utc)
                         i[kk][kkk] = i[kk][kkk].strftime("%Y-%m-%dT%H:%M:%S") 
-        # print(i["created_at"], datetime2snowflake(pd.to_datetime(pd.Timestamp(np.datetime64(i["created_at"])))))
         followers.append(i)
     
     return {usr_id: followers} 

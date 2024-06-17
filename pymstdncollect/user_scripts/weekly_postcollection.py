@@ -39,7 +39,7 @@ def weekly_users_postcollection(sourcedir, mindate, maxdate, dbconn=None, outdir
     months = [f.name for m in years for f in os.scandir("{}/toots/{}/".format(sourcedir, m)) if f.is_dir()]     
     usersactivity = collect_users_activity_stats(sourcedir, years=years, months=months)    
     # 95th percentile of user activity in number of posts
-    topactivity = np.percentile(usersactivity.statuses.values, 90, interpolation="higher")
+    topactivity = np.percentile(usersactivity.statuses.values, 95, interpolation="higher")
     topusers = usersactivity.loc[usersactivity.statuses >= topactivity]
     topusers = topusers.drop_duplicates(["acct"]).reset_index(drop=True)
     if len(topusers) > 10:
@@ -59,6 +59,14 @@ def weekly_users_postcollection(sourcedir, mindate, maxdate, dbconn=None, outdir
                 continue        
             for usertoot in usertoots:                
                 # update db with toots if their date is in current week
+                if "edited_at" in usertoot.keys() and usertoot["edited_at"] is not None:     
+                    if "Z" in usertoot["edited_at"]:
+                        usertoot["edited_at"] = usertoot["edited_at"][:-5]
+                if "Z" in usertoot["created_at"]:
+                    usertoot["created_at"] = usertoot["created_at"][:-5]        
+                if "Z" in usertoot["account"]["created_at"]:
+                    usertoot["account"]["created_at"] = usertoot["account"]["created_at"][:-5]    
+        
                 if "edited_at" in usertoot.keys() and usertoot["edited_at"] is not None and usertoot["edited_at"] != "":
                     try:
                         tootdate = pd.Timestamp(np.datetime64(usertoot["edited_at"])).tz_localize("CET").astimezone(pytz.utc)
@@ -94,7 +102,7 @@ def weekly_toots_postcollection(sourcedir, mindate, maxdate, dbconn=None,
     """weekly_toots_postcollection 
 
         Scans "sourcedir" for toots that are conversation heads 
-        and contain given keywords and collects th full 
+        and contain given keywords and collects the full 
         conversation and boosts.
 
     Args:
@@ -142,7 +150,15 @@ def weekly_toots_postcollection(sourcedir, mindate, maxdate, dbconn=None,
                                         # keep public posts                
                                         if idesc["visibility"] != "public":
                                             continue   
-
+                                        
+                                        if "edited_at" in idesc.keys() and idesc["edited_at"] is not None:     
+                                            if "Z" in idesc["edited_at"]:
+                                                idesc["edited_at"] = idesc["edited_at"][:-5]
+                                        if "Z" in idesc["created_at"]:
+                                            idesc["created_at"] = idesc["created_at"][:-5]        
+                                        if "Z" in idesc["account"]["created_at"]:
+                                            idesc["account"]["created_at"] = idesc["account"]["created_at"][:-5]    
+        
                                         if "edited_at" in idesc.keys() and idesc["edited_at"] is not None and idesc["edited_at"] != "":
                                             try:
                                                 tootdate = pd.Timestamp(np.datetime64(idesc["edited_at"])).tz_localize("CET").astimezone(pytz.utc)
