@@ -96,7 +96,7 @@ def daily_collection_hashtags_users(toot_dir, hashtag_lists_dir, topics, topic_l
 
     Scans the toots and extracts their hashtags if the toot text 
     contains words that are in the topic lists. Most popular hashtags 
-    (95th percentile of hashtags distribution) are then added to the hashtags lists.
+    (95th percentile of hashtag distribution) are then added to the hashtags lists.
 
     NOTE: currently for the topics of Climate, COVID-19 and Immigration. For extra topics, it would need to be extended.
           
