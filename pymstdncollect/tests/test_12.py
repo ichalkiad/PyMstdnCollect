@@ -83,7 +83,8 @@ def test_12():
     upperend = datetime.now(timezone.utc) 
     timestamp = upperend - timedelta(minutes=30)   
     print("Testing 'weekly_users_postcollection'...")
-    weekly_users_postcollection(source_dir=savedir, mindate=timestamp, maxdate=upperend, dbconn=dbconn, outdir=savedir, auth_dict=auth_dict, dbtablename="toots")
+    weekly_users_postcollection(source_dir=None, mindate=timestamp, maxdate=upperend, dbconn=dbconn, 
+                                outdir=savedir, auth_dict=auth_dict, dbtablename="toots")
     print("Saved list of critical users in {}/criticalusers/.".format(savedir))
     ##################################################
     ##################################################
