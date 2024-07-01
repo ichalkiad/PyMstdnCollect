@@ -15,7 +15,7 @@ from pymstdncollect.src.utils import add_unique_account_id, add_unique_toot_id, 
                         load_keywords_topic_lists, get_toot_from_statusid, \
                             save2json_apidirect
 from pymstdncollect.src.interactions import get_outbox_from_user, get_parent_toot
-from pymstdncollect.src.db import build_db_row, execute_insert_sql, execute_update_replies_sql
+from pymstdncollect.src.db import build_db_row, execute_insert_sql, execute_update_replies_sql, db_row_to_json
 
 ###################################
 # data collection based on hashtags
@@ -87,7 +87,7 @@ def collect_hashtag_interactions_apidirect(res, instance_name):
 # helper functions for daily hashtag and user collection
 ###################################
 
-def daily_collection_hashtags_users(toot_dir, hashtag_lists_dir, topics, topic_lists_dir):
+def daily_collection_hashtags_users(dbconn=None, toot_dir=None, hashtag_lists_dir=None, topics=None, topic_lists_dir=None, dbtablename="toots"):
     """daily_collection_hashtags_users :
     
     Takes as input the directories that contain the saved toots, 
@@ -116,25 +116,41 @@ def daily_collection_hashtags_users(toot_dir, hashtag_lists_dir, topics, topic_l
     for top in topics:
         hashtags_dict[top] = []
 
-    yearlists = [f.name for f in os.scandir("{}/toots/".format(toot_dir)) if f.is_dir()]     
-    for yearfolder in yearlists:
-        print(yearfolder)
-        datadir = "{}/toots/{}/".format(toot_dir, yearfolder)
-        monthlists = [f.name for f in os.scandir("{}/toots/{}".format(toot_dir, yearfolder)) if f.is_dir()]
-        for monthfolder in monthlists:
-            with jsonlines.open("{}/{}/toots.jsonl".format(datadir, monthfolder), "r") as jsonl_read:
-                # start reading jsonl for daily collected toots
-                for data in jsonl_read.iter(type=dict, skip_invalid=True):
-                    tootwords = data["toottext"].split()
-                    # extract hashtags from topic relevant toots (based on context) and store in temporary lists
-                    tags = [tg["name"] for tg in data["tags"]]
-                    if len(tags) > 0:
-                        for tw in tootwords:
-                            for kwindex in range(len(keywordsearchers)):
-                                topkw = topics[kwindex]
-                                kwsearch = keywordsearchers[kwindex]
-                                if tw in kwsearch:
-                                    hashtags_dict[topkw].extend(tags)
+    if dbconn is None and toot_dir is not None:
+        yearlists = [f.name for f in os.scandir("{}/toots/".format(toot_dir)) if f.is_dir()]     
+        for yearfolder in yearlists:
+            print(yearfolder)
+            datadir = "{}/toots/{}/".format(toot_dir, yearfolder)
+            monthlists = [f.name for f in os.scandir("{}/toots/{}".format(toot_dir, yearfolder)) if f.is_dir()]
+            for monthfolder in monthlists:
+                with jsonlines.open("{}/{}/toots.jsonl".format(datadir, monthfolder), "r") as jsonl_read:
+                    # start reading jsonl for daily collected toots
+                    for data in jsonl_read.iter(type=dict, skip_invalid=True):
+                        tootwords = data["toottext"].split()
+                        # extract hashtags from topic relevant toots (based on context) and store in temporary lists
+                        tags = [tg["name"] for tg in data["tags"]]
+                        if len(tags) > 0:
+                            for tw in tootwords:
+                                for kwindex in range(len(keywordsearchers)):
+                                    topkw = topics[kwindex]
+                                    kwsearch = keywordsearchers[kwindex]
+                                    if tw in kwsearch:
+                                        hashtags_dict[topkw].extend(tags)
+    elif dbconn is not None and toot_dir is None:
+        sql = '''SELECT * FROM {}'''.format(dbtablename)
+        c = dbconn.cursor()
+        c.execute(sql)
+        for row in c:
+            toot = db_row_to_json(row)
+            tootwords = toot["toottext"].split()
+            tags = [tg["name"] for tg in toot["tags"]]
+            if len(tags) > 0:
+                for tw in tootwords:
+                    for kwindex in range(len(keywordsearchers)):
+                        topkw = topics[kwindex]
+                        kwsearch = keywordsearchers[kwindex]
+                        if tw in kwsearch:
+                            hashtags_dict[topkw].extend(tags)
                            
     # keep top 95th percentile of hashtags and add them to hashtag list   
     for hashtagkey in topics:

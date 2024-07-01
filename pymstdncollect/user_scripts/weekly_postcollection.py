@@ -216,6 +216,8 @@ if __name__ == "__main__":
     topics = ["climatechange", "epidemics", "immigration"]
     maxdate = datetime.now(timezone.utc)
     mindate = maxdate - timedelta(days=10)
-    daily_collection_hashtags_users(toot_dir, hashtag_lists_dir, topics, topic_lists_dir)
+    daily_collection_hashtags_users(dbconn=dbconn, toot_dir=None, hashtag_lists_dir=hashtag_lists_dir, topics=topics, 
+                                    topic_lists_dir=topic_lists_dir, dbtablename="toots")
     weekly_users_postcollection(toot_dir, mindate, maxdate, dbconn=dbconn, outdir=toot_dir, auth_dict=auth_dict)
-    weekly_toots_postcollection(toot_dir, mindate, maxdate, dbconn=dbconn, topics=topics, topic_lists_dir=topic_lists_dir, auth_dict=auth_dict)  
+    weekly_toots_postcollection(toot_dir, mindate, maxdate, dbconn=dbconn, topics=topics, 
+                                topic_lists_dir=topic_lists_dir, auth_dict=auth_dict)  

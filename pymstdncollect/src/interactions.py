@@ -285,7 +285,7 @@ def get_boosts(toot, instance, auth_dict):
 # data collection for follower relationships
 ###################################
 
-def collect_user_followers_apidirect(res, usr_id, keywords, textprocessor, instance_name):
+def collect_user_followers_apidirect(res, usr_id, keywords=None, textprocessor=None, instance_name=None):
 
     # convert to json
     fetched_followers = res.json()    

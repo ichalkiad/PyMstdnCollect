@@ -51,4 +51,5 @@ if __name__ == "__main__":
     toot_dir = "/home/yannis/Dropbox (Heriot-Watt University Team)/mstdncollect/"
     hashtag_lists_dir = "/home/yannis/Dropbox (Heriot-Watt University Team)/mstdncollect/collection_hashtags/"
     topic_lists_dir = "/home/yannis/Dropbox (Heriot-Watt University Team)/mstdncollect/"
-    daily_collection_hashtags_users(toot_dir, hashtag_lists_dir, topic_lists_dir)
+    daily_collection_hashtags_users(dbconn=dbconn, toot_dir=None, hashtag_lists_dir=hashtag_lists_dir, 
+                                    topic_lists_dir=topic_lists_dir, dbtablename="toots")
