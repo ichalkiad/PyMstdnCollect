@@ -16,6 +16,7 @@ from datetime import timedelta
 from collections import Counter
 import numpy as np
 from treelib import Tree
+from datetime import datetime
 
 def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
@@ -141,7 +142,7 @@ def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remo
                             monthyear = pd.Timestamp(np.datetime64(idesc["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                         except:
                             monthyear = pd.Timestamp(np.datetime64(idesc["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
+                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')):
                         # do not collect it
                         continue 
 

@@ -9,6 +9,7 @@ import sqlite3
 from sqlite3 import Error
 from pymstdncollect.src.utils import add_unique_account_id, \
                         add_unique_toot_id, get_toot_from_statusid
+from datetime import datetime
 
 ###################################
 # toots db
@@ -242,7 +243,7 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
             except:
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc):
+        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')):
             # do not collect it, in_reply_to_id field of reply remains unchanged
             continue
         parentglobalID = parenttoot["globalID"]
