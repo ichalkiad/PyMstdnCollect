@@ -77,7 +77,7 @@ def weekly_users_postcollection(sourcedir, mindate, maxdate, dbconn=None, outdir
                         tootdate = pd.Timestamp(np.datetime64(usertoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                     except:
                         tootdate = pd.Timestamp(np.datetime64(usertoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                if tootdate < mindate or tootdate > maxdate or tootdate > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')):
+                if tootdate < mindate or tootdate > maxdate or tootdate > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')).tz_localize("Europe/Paris").astimezone(pytz.utc):
                     continue
                 # get boosts for user statuses of current week                
                 reblogs = get_boosts(usertoot, row["instance_name"], auth_dict=auth_dict)

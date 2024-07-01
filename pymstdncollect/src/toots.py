@@ -198,7 +198,7 @@ def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tm
                 
                 print(monthyear)
 
-        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')):
+        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')).tz_localize("Europe/Paris").astimezone(pytz.utc):
             # do not collect it
             continue
         i["instance_name"] = tootinstance
@@ -499,7 +499,7 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
                             monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                         except:
                             monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')):
+                    if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')).tz_localize("Europe/Paris").astimezone(pytz.utc):
                         # do not collect it
                         raise AttributeError
                     parenttoot["account"] = add_unique_account_id(parenttoot["account"], i["instance_name"])
