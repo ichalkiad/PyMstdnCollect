@@ -80,7 +80,7 @@ def test_11():
     ##################################################
     ##################################################
     print("Testing 'daily_collection_hashtags_users'...")
-    daily_collection_hashtags_users(dbconn=dbconn, savedir=None, hashtag_lists_dir=hashtag_lists_dir, 
+    daily_collection_hashtags_users(dbconn=dbconn, toot_dir=None, hashtag_lists_dir=hashtag_lists_dir, 
                                     topics=topics, topic_lists_dir=topic_lists_dir, dbtablename="toots")
     print("Updated hashtag list in {}.".format(hashtag_lists_dir))
     ##################################################
