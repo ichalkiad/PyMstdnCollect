@@ -35,10 +35,14 @@ def weekly_users_postcollection(sourcedir=None, mindate=None, maxdate=None, dbco
     """
     # change head directory structure to toots/year/month/toots.jsonl
 
-    years = [f.name for f in os.scandir("{}/toots/".format(sourcedir)) if f.is_dir()]     
-    months = [f.name for m in years for f in os.scandir("{}/toots/{}/".format(sourcedir, m)) if f.is_dir()]     
+    if sourcedir is not None:
+        years  = [f.name for f in os.scandir("{}/toots/".format(sourcedir)) if f.is_dir()]     
+        months = [f.name for m in years for f in os.scandir("{}/toots/{}/".format(sourcedir, m)) if f.is_dir()]  
+    else:
+        years  = []
+        months = []   
     usersactivity = collect_users_activity_stats(dbconn=dbconn, input_dir=sourcedir, 
-                                                 years=years, months=months, dbtablename=dbtablename)    
+                                                years=years, months=months, dbtablename=dbtablename)    
     # 95th percentile of user activity in number of posts
     topactivity = np.percentile(usersactivity.statuses.values, 95, method="higher")
     topusers = usersactivity.loc[usersactivity.statuses >= topactivity]
