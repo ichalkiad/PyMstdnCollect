@@ -254,32 +254,51 @@ def collect_user_postingactivity_apidirect(useracct, instance_name, savedir="/tm
                         "{}".format(savedir))
     return filtered_toots, collected_tags
 
-def collect_users_activity_stats(input_dir, years=[], months=[]):
+def collect_users_activity_stats(dbconn=None, input_dir=None, years=[], months=[], dbtablename="toots"):
 
     dictout = {"acct": [], "globalID": [], "instance_name": [], "followers": [], "following": [], "statuses": []}
-    if len(years) == 0:
-        years = [f.name for f in os.scandir("{}/toots/".format(input_dir)) if f.is_dir()]    
-    for year in years:
-        if len(months) == 0:
-            months = [f.name for f in os.scandir("{}/toots/{}/".format(input_dir, year)) if f.is_dir()]
-        for month in months:
-            try:
-                with jsonlines.open("{}/toots/{}/{}/toots.jsonl".format(input_dir, year, month), "r") as jsonl_read:
-                    for data in jsonl_read.iter(type=dict, skip_invalid=True):
-                        usr_acct = data["account"]["acct"]
-                        usr_accid = data["account"]["globalID"]
-                        usr_instance = data["instance_name"]
-                        usr_followers_cnt = data["account"]["followers_count"]
-                        usr_following_cnt = data["account"]["following_count"]
-                        usr_statuses_cnt = data["account"]["statuses_count"]
-                        dictout["acct"].append(usr_acct)
-                        dictout["globalID"].append(usr_accid)
-                        dictout["instance_name"].append(usr_instance)
-                        dictout["followers"].append(usr_followers_cnt)
-                        dictout["following"].append(usr_following_cnt)
-                        dictout["statuses"].append(usr_statuses_cnt)
-            except:
-                continue
+    if dbconn is None and input_dir is not None:
+        if len(years) == 0:
+            years = [f.name for f in os.scandir("{}/toots/".format(input_dir)) if f.is_dir()]    
+        for year in years:
+            if len(months) == 0:
+                months = [f.name for f in os.scandir("{}/toots/{}/".format(input_dir, year)) if f.is_dir()]
+            for month in months:
+                try:
+                    with jsonlines.open("{}/toots/{}/{}/toots.jsonl".format(input_dir, year, month), "r") as jsonl_read:
+                        for data in jsonl_read.iter(type=dict, skip_invalid=True):
+                            usr_acct = data["account"]["acct"]
+                            usr_accid = data["account"]["globalID"]
+                            usr_instance = data["instance_name"]
+                            usr_followers_cnt = data["account"]["followers_count"]
+                            usr_following_cnt = data["account"]["following_count"]
+                            usr_statuses_cnt = data["account"]["statuses_count"]
+                            dictout["acct"].append(usr_acct)
+                            dictout["globalID"].append(usr_accid)
+                            dictout["instance_name"].append(usr_instance)
+                            dictout["followers"].append(usr_followers_cnt)
+                            dictout["following"].append(usr_following_cnt)
+                            dictout["statuses"].append(usr_statuses_cnt)
+                except:
+                    continue
+    elif dbconn is not None and input_dir is None:
+        sql = '''SELECT * FROM {}'''.format(dbtablename)
+        c = dbconn.cursor()
+        c.execute(sql)
+        for row in c:
+            toot = db_row_to_json(row)
+            usr_acct = toot["account"]["acct"]
+            usr_accid = toot["account"]["globalID"]
+            usr_instance = toot["instance_name"]
+            usr_followers_cnt = toot["account"]["followers_count"]
+            usr_following_cnt = toot["account"]["following_count"]
+            usr_statuses_cnt = toot["account"]["statuses_count"]
+            dictout["acct"].append(usr_acct)
+            dictout["globalID"].append(usr_accid)
+            dictout["instance_name"].append(usr_instance)
+            dictout["followers"].append(usr_followers_cnt)
+            dictout["following"].append(usr_following_cnt)
+            dictout["statuses"].append(usr_statuses_cnt)
 
     if len(dictout["acct"]) > 0:
         return pd.DataFrame.from_dict(dictout)

@@ -29,8 +29,7 @@ def test_11():
     topics = ["epidemics"]
     hashtag_lists_dir = "./pymstdncollect/tests/collection_hashtags/"
     topic_lists_dir = "./pymstdncollect/tests/topiclists/"
-    
-    
+        
     upperend = datetime.now(timezone.utc) 
     max_id_snowflake = datetime2snowflake(upperend)
     timestamp = upperend - timedelta(days=7)
@@ -81,7 +80,8 @@ def test_11():
     ##################################################
     ##################################################
     print("Testing 'daily_collection_hashtags_users'...")
-    daily_collection_hashtags_users(savedir, hashtag_lists_dir, topics, topic_lists_dir)
+    daily_collection_hashtags_users(dbconn=dbconn, savedir=None, hashtag_lists_dir=hashtag_lists_dir, 
+                                    topics=topics, topic_lists_dir=topic_lists_dir)
     print("Updated hashtag list in {}.".format(hashtag_lists_dir))
     ##################################################
     ##################################################

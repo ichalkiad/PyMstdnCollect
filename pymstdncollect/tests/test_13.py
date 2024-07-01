@@ -81,7 +81,8 @@ def test_13():
     ##################################################
     ##################################################
     print("Testing 'weekly_toots_postcollection'...")
-    weekly_toots_postcollection(savedir, timestamp, upperend, dbconn=dbconn, topics=topics[:1], topic_lists_dir=topic_lists_dir, auth_dict=auth_dict)  
+    weekly_toots_postcollection(savedir, timestamp, upperend, dbconn=dbconn, topics=topics[:1], 
+                                topic_lists_dir=topic_lists_dir, auth_dict=auth_dict)  
     print("Collected conversations of toots that are conversation starters.")
     ##################################################
     ##################################################
