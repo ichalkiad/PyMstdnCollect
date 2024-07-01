@@ -243,7 +243,7 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("CET").astimezone(pytz.utc)
             except:
                 monthyear = pd.Timestamp(np.datetime64(parenttoot["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d').tz_localize("Europe/Paris").astimezone(pytz.utc)):
+        if monthyear < pd.Timestamp(cutoff_date).tz_localize("Europe/Paris").astimezone(pytz.utc) or monthyear > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')).tz_localize("Europe/Paris").astimezone(pytz.utc):
             # do not collect it, in_reply_to_id field of reply remains unchanged
             continue
         parentglobalID = parenttoot["globalID"]

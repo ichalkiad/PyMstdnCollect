@@ -169,7 +169,7 @@ def weekly_toots_postcollection(sourcedir, mindate, maxdate, dbconn=None,
                                                 tootdate = pd.Timestamp(np.datetime64(idesc["created_at"])).tz_localize("CET").astimezone(pytz.utc)
                                             except:
                                                 tootdate = pd.Timestamp(np.datetime64(idesc["created_at"])).tz_localize("Europe/Paris").astimezone(pytz.utc)
-                                        if tootdate < mindate or tootdate > maxdate or tootdate > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')):
+                                        if tootdate < mindate or tootdate > maxdate or tootdate > pd.Timestamp(datetime.today().strftime('%Y-%m-%d')).tz_localize("Europe/Paris").astimezone(pytz.utc):
                                             # do not collect it
                                             continue 
                                         
