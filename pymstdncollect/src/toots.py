@@ -300,6 +300,7 @@ def collect_users_activity_stats(dbconn=None, input_dir=None, years=[], months=[
             dictout["following"].append(usr_following_cnt)
             dictout["statuses"].append(usr_statuses_cnt)
 
+    ipdb.set_trace()
     if len(dictout["acct"]) > 0:
         return pd.DataFrame.from_dict(dictout)
     else:

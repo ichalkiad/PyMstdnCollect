@@ -77,6 +77,71 @@ def test_12():
     ##################################################
     ##################################################
     
+    ##################################################
+    print("Getting some data in the db...")
+    keywords = []
+    textprocessor = None
+    instance_name = "piaille.fr"
+    apibaseurl = "https://{}/api/v1/timelines/public".format(instance_name)        
+    try:
+        r = requests.get(apibaseurl, timeout=300)
+    except requests.exceptions.ConnectionError:
+        # Network/DNS error, wait 30mins and retry
+        time.sleep(60)
+    except requests.exceptions.HTTPError as e:
+        print("HTTPError issue: {}...exiting".format(e.response.status_code))
+        logging.info("HTTPError issue: {}...exiting".format(e.response.status_code))
+    except requests.exceptions.Timeout:
+        print("Timeout...exiting")
+        logging.info("Timeout...exiting")
+    except requests.exceptions.TooManyRedirects:
+        print("Too many redirects...exiting")
+        logging.info("Too many redirects...exiting")
+    except requests.exceptions.RequestException as e:
+        print("Uknown GET issue: {}...exiting".format(e.response.status_code))
+        logging.info("Uknown GET issue: {}...exiting".format(e.response.status_code))
+    filtered_toots, collected_tags, collected_users = \
+                    collect_toots_and_tooters_apidirect(dbconn, r, keywords, 
+                                                        textprocessor, 
+                                                        instance_name=instance_name, 
+                                                        auth_dict=auth_dict)
+    print("Collected {} toots, {} tags and {} users...".format(len(filtered_toots), 
+                                                               len(collected_tags), 
+                                                               len(collected_users)))
+    ##################################################
+    ##################################################
+
+    ##################################################
+    ##################################################
+    hashtag = "euelections"
+    instance_name = "mastodon.social"
+    apibaseurl = "https://{}/api/v1/timelines/tag/{}".format(instance_name, hashtag)
+    try:
+        r = requests.get(apibaseurl, timeout=300)
+    except requests.exceptions.ConnectionError:
+        # Network/DNS error, wait 30mins and retry
+        time.sleep(60)
+    except requests.exceptions.HTTPError as e:
+        print("HTTPError issue: {}...exiting".format(e.response.status_code))
+        logging.info("HTTPError issue: {}...exiting".format(e.response.status_code))
+    except requests.exceptions.Timeout:
+        print("Timeout...exiting")
+        logging.info("Timeout...exiting")
+    except requests.exceptions.TooManyRedirects:
+        print("Too many redirects...exiting")
+        logging.info("Too many redirects...exiting")
+    except requests.exceptions.RequestException as e:
+        print("Uknown GET issue: {}...exiting".format(e.response.status_code))
+        logging.info("Uknown GET issue: {}...exiting".format(e.response.status_code))
+    print("Testing 'collect_hashtag_interactions_apidirect'...")
+    filtered_toots, collected_tags, collected_users = \
+                    collect_hashtag_interactions_apidirect(r, instance_name=instance_name)
+    ##################################################
+    ##################################################
+
+
+
+
 
     ##################################################
     ##################################################

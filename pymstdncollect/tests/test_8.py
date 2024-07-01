@@ -26,11 +26,6 @@ def test_8():
     with open("./authorisations/auth_dict.json", "r") as f:
         auth_dict = json.load(f)    
     
-    topics = ["epidemics"]
-    hashtag_lists_dir = "./pymstdncollect/tests/collection_hashtags/"
-    topic_lists_dir = "./pymstdncollect/tests/topiclists/"
-    
-    
     upperend = datetime.now(timezone.utc) 
     max_id_snowflake = datetime2snowflake(upperend)
     timestamp = upperend - timedelta(days=7)

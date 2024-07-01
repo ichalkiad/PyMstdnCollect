@@ -24,12 +24,7 @@ def test_14():
 
     savedir = "/tmp/"
     with open("./authorisations/auth_dict.json", "r") as f:
-        auth_dict = json.load(f)    
-    
-    topics = ["epidemics"]
-    hashtag_lists_dir = "./pymstdncollect/tests/collection_hashtags/"
-    topic_lists_dir = "./pymstdncollect/tests/topiclists/"
-    
+        auth_dict = json.load(f)      
     
     upperend = datetime.now(timezone.utc) 
     max_id_snowflake = datetime2snowflake(upperend)
@@ -89,10 +84,11 @@ def test_14():
     timestamp = upperend - timedelta(days=15)
     min_id_snowflake = datetime2snowflake(timestamp)    
     print(max_id_snowflake, min_id_snowflake)
-    allcollectedhashtags = collect_timeline_hashtag_apidirect(hashtag=hashtag, url=apibaseurl, local=False, remote=False, only_media=False,
-                                max_id=max_id_snowflake, since_id=min_id_snowflake, min_id=None, limit=40, 
-                                keywords=[], textprocessor=None, savedir="/tmp/", 
-                                instance_name=instance_name, allcollectedhashtags=allcollectedhashtags, print_tree=tree, dbconn=dbconn, auth_dict=auth_dict)
+    allcollectedhashtags = collect_timeline_hashtag_apidirect(hashtag=hashtag, url=apibaseurl, local=False, 
+                                remote=False, only_media=False, max_id=max_id_snowflake, 
+                                since_id=min_id_snowflake, min_id=None, limit=40, keywords=[], 
+                                textprocessor=None, savedir="/tmp/", instance_name=instance_name, 
+                                allcollectedhashtags=allcollectedhashtags, print_tree=tree, dbconn=dbconn, auth_dict=auth_dict)
     print("Collected {} toots based on hashtag {} from {}.".format(len(allcollectedhashtags), hashtag, instance_name))
     ##################################################
     ##################################################
