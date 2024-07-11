@@ -16,8 +16,7 @@ from datetime import timedelta
 from collections import Counter
 import numpy as np
 from treelib import Tree
-from datetime import datetime
-import timezone
+from datetime import datetime, timezone
 
 def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
