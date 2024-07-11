@@ -13,10 +13,6 @@ import json
 
 if __name__ == "__main__":
 
-    # export apibaseurl=https://mastodon.social/ 
-    # export clientid=ZZ6HCL2NZCWIkI8eBVlE6PPAcxmdwhvBMRu4SV6XNCM
-    # export clientsecret=L_pXSXoKFjLqlzO1fDuZP-Pm2Y1KanayD9Y1JYF3V6I
-    # export accesstoken=Bp0piIKgU7Yjyih1Y8tMeiOtCqT_mGAMTTjSsU83LYU
     parallel = False
     with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
         auth_dict = json.load(f)    
@@ -30,7 +26,7 @@ if __name__ == "__main__":
     print(max_id_snowflake, min_id_snowflake)
     # DIR_out = "./mastodon.social_allpublic_apidirect_nofilter/"   
 
-    DIR_out = "/mnt2/dailycollects/"   
+    DIR_out = "/mnt2/dailycollects_pymstdn/"   
     pathlib.Path(DIR_out).mkdir(parents=True, exist_ok=True)
     pathlib.Path("{}/logging/".format(DIR_out)).mkdir(parents=True, exist_ok=True)
     logging.basicConfig(filename="{}/logging/logging_{}.txt".format(DIR_out, 
@@ -41,7 +37,7 @@ if __name__ == "__main__":
                     level=logging.INFO)
     logging.info("Until: {}".format(timestamp.strftime("%Y-%m-%dT%H:%M:%S")))
     
-    database = "{}/toots_db_{}_{}.db".format(DIR_out, timestamp.strftime("%Y-%m-%dT%H:%M:%S"), upperend.strftime("%Y-%m-%dT%H:%M:%S"))
+    database = "{}/toots_db_{}_{}.db".format(DIR_out, timestamp.strftime("%Y-%m-%d"), upperend.strftime("%Y-%m-%d"))
 
     sql_create_toots_table = """ CREATE TABLE IF NOT EXISTS toots (
                                        globalID text PRIMARY KEY,

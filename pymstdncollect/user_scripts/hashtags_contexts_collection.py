@@ -17,6 +17,7 @@ from collections import Counter
 import numpy as np
 from treelib import Tree
 from datetime import datetime
+import timezone
 
 def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
@@ -207,17 +208,17 @@ if __name__ == "__main__":
     # DEVISE STOPPING RULE FOR HASHTAGS, INFEASIBLE TO CHECK ALL OF THEM
 
     parallel = False
-    with open("./authorisations/auth_dict.json", "r") as f:
+    with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
         auth_dict = json.load(f)    
     topics = ["climatechange", "epidemics", "immigration"]
 
-    upperend = pd.Timestamp("2024-02-14") # datetime.now(timezone.utc) 
-    # upperend = upperend - timedelta(days=15) # as per David: collect past 72h-48h intervals so that we have "favorited post" information 
+    upperend = datetime.now(timezone.utc) 
+    upperend = upperend - timedelta(days=15) # as per David: collect past 72h-48h intervals so that we have "favorited post" information 
     max_id_snowflake = datetime2snowflake(upperend)
     timestamp = upperend - timedelta(days=7)
     min_id_snowflake = datetime2snowflake(timestamp)    
     print(max_id_snowflake, min_id_snowflake)
-    database = "/mnt2/toots_hashtags_{}_{}.db".format(timestamp.strftime("%Y-%m-%d"), upperend.strftime("%Y-%m-%d"))
+    database = "/mnt2/dailycollects_pymstdn/toots_hashtags_{}_{}.db".format(timestamp.strftime("%Y-%m-%d"), upperend.strftime("%Y-%m-%d"))
     sql_create_toots_table = """ CREATE TABLE IF NOT EXISTS toots (
                                        globalID text PRIMARY KEY,
                                        id text NOT NULL,

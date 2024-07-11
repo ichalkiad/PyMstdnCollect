@@ -8,8 +8,8 @@ if __name__ == "__main__":
 
 
     mindate = datetime.now(timezone.utc) 
-    maxdate = mindate + timedelta(days=7)    
-    database = "/tmp/weekly_toots_db2.db"   #{}_{}.db".format(mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d"))
+    maxdate = mindate - timedelta(days=7)    
+    database = "/mnt2/dailycollects_pymstdn/toots_db_{}_{}.db".format(mindate.strftime("%Y-%m-%d"), maxdate.strftime("%Y-%m-%d"))
 
     sql_create_toots_table = """ CREATE TABLE IF NOT EXISTS toots (
                                         globalID text PRIMARY KEY,
@@ -48,8 +48,8 @@ if __name__ == "__main__":
 
     dbconn = connectTo_weekly_toots_db(database)
     execute_create_sql(dbconn, sql_create_toots_table)
-    toot_dir = "/home/yannis/Dropbox (Heriot-Watt University Team)/mstdncollect/"
-    hashtag_lists_dir = "/home/yannis/Dropbox (Heriot-Watt University Team)/mstdncollect/collection_hashtags/"
-    topic_lists_dir = "/home/yannis/Dropbox (Heriot-Watt University Team)/mstdncollect/"
+    toot_dir = "/home/ubuntu/mstdncollect/"
+    hashtag_lists_dir = "/home/ubuntu/mstdncollect/collection_hashtags/"
+    topic_lists_dir = "/home/ubuntu/mstdncollect/"
     daily_collection_hashtags_users(dbconn=dbconn, toot_dir=None, hashtag_lists_dir=hashtag_lists_dir, 
                                     topic_lists_dir=topic_lists_dir, dbtablename="toots")

@@ -213,13 +213,13 @@ def weekly_toots_postcollection(sourcedir=None, mindate=None, maxdate=None, dbco
 
 if __name__ == "__main__":
 
-    with open("./authorisations/auth_dict.json", "r") as f:
+    with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
         auth_dict = json.load(f) 
 
-    database = "/mnt2/toots_db.db"
+    database = "/mnt2/dailycollects_pymstdn/tootsweekly_db.db"   
 
     dbconn = connectTo_weekly_toots_db(database)
-    toot_dir = "/mnt2/mstdndata/"
+    toot_dir = None #"/mnt2/mstdndata/"
     hashtag_lists_dir = "/home/ubuntu/mstdncollect/collection_hashtags/"
     topic_lists_dir = "/home/ubuntu/mstdncollect/topiclists_iscpif/"
     
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     topics = ["climatechange", "epidemics", "immigration"]
     maxdate = datetime.now(timezone.utc)
     mindate = maxdate - timedelta(days=10)
-    daily_collection_hashtags_users(dbconn=dbconn, toot_dir=None, hashtag_lists_dir=hashtag_lists_dir, topics=topics, 
+    daily_collection_hashtags_users(dbconn=dbconn, toot_dir=toot_dir, hashtag_lists_dir=hashtag_lists_dir, topics=topics, 
                                     topic_lists_dir=topic_lists_dir, dbtablename="toots")
     weekly_users_postcollection(sourcedir=None, mindate=mindate, maxdate=maxdate, dbconn=dbconn, 
                                 outdir=toot_dir, auth_dict=auth_dict, dbtablename="toots")
