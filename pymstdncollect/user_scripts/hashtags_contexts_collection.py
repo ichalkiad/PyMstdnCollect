@@ -1,7 +1,6 @@
 import json
 import requests
 import pandas as pd
-import ipdb
 import time 
 import pathlib 
 import pytz
@@ -21,7 +20,8 @@ from datetime import datetime, timezone
 def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remote=False, only_media=False,
                             max_id=None, since_id=None, min_id=None,limit=40, 
                             keywords=[], textprocessor=None, savedir="/tmp/", 
-                            instance_name=None, allcollectedhashtags=[], print_tree=False, dbconn=None, auth_dict=None, cutoff_date="2023-12-02"):
+                            instance_name=None, allcollectedhashtags=[], print_tree=False, dbconn=None, 
+                            auth_dict=None, cutoff_date="2023-12-02"):
     """collect_timeline_hashtag_apidirect 
 
     Collects timelines and conversation data based on 
@@ -204,20 +204,23 @@ def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remo
 
 if __name__ == "__main__":
 
-    # DEVISE STOPPING RULE FOR HASHTAGS, INFEASIBLE TO CHECK ALL OF THEM
-
     parallel = False
-    with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
+    authdict_fullpath = "./authorisations/auth_dict.json"
+    with open(authdict_fullpath, "r") as f:
         auth_dict = json.load(f)    
-    topics = ["climatechange", "epidemics", "immigration"]
-
+    # Topics for which the data collection will be run - the corresponding hashtags and dictionaries should be
+    # in topiclists/ and collection_hashtags/
+    topics = ["epidemics"]
+    # Provide paths of directories that contain the hashtags lists that will be used
+    hashtag_lists_dir = "/home/ubuntu/PyMstdnCollect/collection_hashtags/"    
     upperend = datetime.now(timezone.utc) 
-    upperend = upperend - timedelta(days=15) # as per David: collect past 72h-48h intervals so that we have "favorited post" information 
+    upperend = upperend - timedelta(days=15)
     max_id_snowflake = datetime2snowflake(upperend)
     timestamp = upperend - timedelta(days=7)
     min_id_snowflake = datetime2snowflake(timestamp)    
     print(max_id_snowflake, min_id_snowflake)
-    database = "/mnt2/dailycollects_pymstdn/toots_hashtags_{}_{}.db".format(timestamp.strftime("%Y-%m-%d"), upperend.strftime("%Y-%m-%d"))
+    # Provide full path for the output database
+    database = "/tmp/toots_hashtags_{}_{}.db".format(timestamp.strftime("%Y-%m-%d"), upperend.strftime("%Y-%m-%d"))
     sql_create_toots_table = """ CREATE TABLE IF NOT EXISTS toots (
                                        globalID text PRIMARY KEY,
                                        id text NOT NULL,
@@ -255,24 +258,18 @@ if __name__ == "__main__":
                                    ); """
     dbconn = connectTo_weekly_toots_db(database)
     execute_create_sql(dbconn, sql_create_toots_table) 
-    ##################################################
-    
-
-    # database = "/mnt2/toots_hashtags_{}_{}.db".format(timestamp.strftime("%Y-%m-%d"), upperend.strftime("%Y-%m-%d"))
-    # dbconn = connectTo_weekly_toots_db(database)
-    hashtag_lists_dir = "/home/ubuntu/mstdncollect/collection_hashtags/"
-    tree = False    
-    climate_hashtags = pd.read_csv("{}/climate_hashtags_upd.csv".format(hashtag_lists_dir), header=None)  # for subsequent runs change to _upd
-    covid_hashtags = pd.read_csv("{}/epidemics_hashtags_upd.csv".format(hashtag_lists_dir), header=None)
-    immigration_hashtags = pd.read_csv("{}/immigration_hashtags_upd.csv".format(hashtag_lists_dir), header=None)
-    climate_hashtags_list = climate_hashtags.values.flatten().tolist()
-    covid_hashtags_list = covid_hashtags.values.flatten().tolist()
-    immigration_hashtags_list = immigration_hashtags.values.flatten().tolist()
-
-    hashtag_list_all = [climate_hashtags_list, covid_hashtags_list, immigration_hashtags_list]
+ 
+    # Flag to determine printing of conversation tree - useful for debugging and understanding
+    tree = False        
+    hashtag_list_all = []
     hashtag_list_names = topics
+    for t in topics:
+        hashtags = pd.read_csv("{}/{}_hashtags.csv".format(hashtag_lists_dir, t), header=None)    
+        hashtags_list = hashtags.values.flatten().tolist()    
+        hashtag_list_all.append(hashtags_list)
+
     allcollectedhashtags = []
-    for hashtaglistidx in range(3):
+    for hashtaglistidx in range(len(hashtag_list_names)):
         hashtaglist = hashtag_list_all[hashtaglistidx]
         name = hashtag_list_names[hashtaglistidx]
         for hashtag in hashtaglist:
@@ -290,4 +287,5 @@ if __name__ == "__main__":
             if hashdict[i] >= ninthdec and i not in hashtaglist:
                 hashtaglist.append(i)
         print(hashtaglist)
-        pd.DataFrame.from_dict({"hashtags": list(set(hashtaglist))}).to_csv("{}/{}_hashtags_upd.csv".format(hashtag_lists_dir, name), index=False, header=False)
+        # Note that hashtag list will be overwritten to include new entries
+        pd.DataFrame.from_dict({"hashtags": list(set(hashtaglist))}).to_csv("{}/{}_hashtags.csv".format(hashtag_lists_dir, name), index=False, header=False)

@@ -1,5 +1,4 @@
 import pandas as pd
-import ipdb
 from datetime import datetime 
 import time 
 import pathlib 
@@ -98,10 +97,6 @@ def daily_collection_hashtags_users(dbconn=None, toot_dir=None, hashtag_lists_di
     contains words that are in the topic lists. Most popular hashtags 
     (95th percentile of hashtag distribution) are then added to the hashtags lists.
 
-    NOTE: currently for the topics of Climate, COVID-19 and Immigration. For extra topics, it would need to be extended.
-          
-    TODO: modify to work on database instead of toots.json directory
-
     Args:
         toot_dir (_type_): _description_
         hashtag_lists_dir (bool): _description_
@@ -161,14 +156,14 @@ def daily_collection_hashtags_users(dbconn=None, toot_dir=None, hashtag_lists_di
             tophst = np.percentile(hashtagscntsval, 95, method="higher")
             newtopichashtags = [i for i in hashtagscnts.keys() if hashtagscnts[i] >= tophst]
             print(newtopichashtags)
-            if pathlib.Path("{}/{}_hashtags_upd.csv".format(hashtag_lists_dir, hashtagkey)).exists():
-                hash_tmp = pd.read_csv("{}/{}_hashtags_upd.csv".format(hashtag_lists_dir, hashtagkey))
+            if pathlib.Path("{}/{}_hashtags.csv".format(hashtag_lists_dir, hashtagkey)).exists():
+                hash_tmp = pd.read_csv("{}/{}_hashtags.csv".format(hashtag_lists_dir, hashtagkey))
                 hash_tmp = hash_tmp.tags.tolist()
                 hash_tmp.extend(newtopichashtags)
                 hash_tmp = np.unique(hash_tmp).tolist()
-                pd.DataFrame.from_dict({"tags": hash_tmp}).to_csv("{}/{}_hashtags_upd.csv".format(hashtag_lists_dir, hashtagkey), index=False)
+                pd.DataFrame.from_dict({"tags": hash_tmp}).to_csv("{}/{}_hashtags.csv".format(hashtag_lists_dir, hashtagkey), index=False)
             else:
-                pd.DataFrame.from_dict({"tags": newtopichashtags}).to_csv("{}/{}_hashtags_upd.csv".format(hashtag_lists_dir, hashtagkey), index=False)
+                pd.DataFrame.from_dict({"tags": newtopichashtags}).to_csv("{}/{}_hashtags.csv".format(hashtag_lists_dir, hashtagkey), index=False)
 
 ###################################
 # data collection for user posts
@@ -484,9 +479,7 @@ def collect_toots_and_tooters_apidirect(dbconn, res, keywords, textprocessor, in
         toottext = toottext.lower()
         if len(keywords) > 0:
             def contains_kw(x): return x.lower() in toottext
-            found_kws_iterator = filter(contains_kw, keywords)
-            # Note: consider more finegrained, e.g. separation of output directory depending - TODO later?
-            # on which keywords were spotted
+            found_kws_iterator = filter(contains_kw, keywords)           
             if len(list(found_kws_iterator)) > 0:
                 filtered_toots.append(i)
         else:

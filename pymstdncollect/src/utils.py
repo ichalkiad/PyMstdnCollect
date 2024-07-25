@@ -1,17 +1,13 @@
-import json
 import pandas as pd
-import ipdb
 from datetime import datetime 
 import time 
 import pathlib 
 import pytz
 import jsonlines
-import os
 import numpy as np
 from flashtext import KeywordProcessor
 import logging
 import requests
-import sys
 import pickle
 
 ###################################
@@ -223,7 +219,7 @@ def get_user_id_from_username(username, url, instance_name, auth_dict):
 # keyword lists
 ###################################
 
-def load_keywords_topic_lists(topics=["climatechange", "epidemics", "immigration"], topic_lists_dir="./topiclists_iscpif/"):
+def load_keywords_topic_lists(topics=["epidemics"], topic_lists_dir="./topiclists/"):
 
     keywordsearchers = []
     for topicname in topics:

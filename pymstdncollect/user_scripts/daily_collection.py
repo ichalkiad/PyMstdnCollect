@@ -14,19 +14,18 @@ import json
 if __name__ == "__main__":
 
     parallel = False
-    with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
-        auth_dict = json.load(f)    
+    authdict_fullpath = "./authorisations/auth_dict.json"
+    with open(authdict_fullpath, "r") as f:
+        auth_dict = json.load(f)  
    
-    # timestamp = datetime.now(timezone.utc) - timedelta(days=1)
     upperend = datetime.now(timezone.utc) 
-    # upperend = upperend - timedelta(days=2) # as per David: collect past 72h-48h intervals so that we have "favorited post" information 
     max_id_snowflake = datetime2snowflake(upperend)
     timestamp = upperend - timedelta(days=1)
     min_id_snowflake = datetime2snowflake(timestamp)    
     print(max_id_snowflake, min_id_snowflake)
-    # DIR_out = "./mastodon.social_allpublic_apidirect_nofilter/"   
-
-    DIR_out = "/mnt2/dailycollects_pymstdn/"   
+    
+    # Provide full path to output directory
+    DIR_out = "/tmp/"   
     pathlib.Path(DIR_out).mkdir(parents=True, exist_ok=True)
     pathlib.Path("{}/logging/".format(DIR_out)).mkdir(parents=True, exist_ok=True)
     logging.basicConfig(filename="{}/logging/logging_{}.txt".format(DIR_out, 

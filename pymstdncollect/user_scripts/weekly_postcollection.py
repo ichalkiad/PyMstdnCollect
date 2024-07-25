@@ -1,4 +1,3 @@
-import ipdb
 import os
 from datetime import datetime, timezone, timedelta
 import pathlib 
@@ -33,8 +32,7 @@ def weekly_users_postcollection(sourcedir=None, mindate=None, maxdate=None, dbco
         dbconn (_type_, optional): _description_. Defaults to None.
         outdir (str, optional): _description_. Defaults to "/tmp/".
     """
-    # change head directory structure to toots/year/month/toots.jsonl
-
+    
     if sourcedir is not None:
         years  = [f.name for f in os.scandir("{}/toots/".format(sourcedir)) if f.is_dir()]     
         months = [f.name for m in years for f in os.scandir("{}/toots/{}/".format(sourcedir, m)) if f.is_dir()]  
@@ -50,10 +48,11 @@ def weekly_users_postcollection(sourcedir=None, mindate=None, maxdate=None, dbco
     if len(topusers) > 10:
         topactivity = np.percentile(topusers.followers.values, 98, interpolation="higher")
         topusers = topusers.loc[topusers.followers >= topactivity].reset_index(drop=True)
+    if outdir is None:
+        outdir = "/tmp/"
     pathlib.Path("{}/criticalusers/".format(outdir)).mkdir(parents=True, exist_ok=True)
     topusers.to_csv("{}/criticalusers/users_{}_{}.csv".format(outdir, mindate.strftime("%d%m%Y"), maxdate.strftime("%d%m%Y")))
-    print(topusers)
-    
+        
     doneusers = []   
     for i, row in topusers.iterrows():
         try:            
@@ -99,7 +98,6 @@ def weekly_users_postcollection(sourcedir=None, mindate=None, maxdate=None, dbco
                 doneusers.append(row["globalID"])
         except:
             print(row)
-
 
 def update_relevant_toots(dbconn, data, keywordsearchers, extra_keywords, auth_dict, mindate, maxdate):
 
@@ -213,15 +211,18 @@ def weekly_toots_postcollection(sourcedir=None, mindate=None, maxdate=None, dbco
 
 if __name__ == "__main__":
 
-    with open("/home/ubuntu/mstdncollect/authorisations/auth_dict.json", "r") as f:
-        auth_dict = json.load(f) 
-
-    database = "/mnt2/dailycollects_pymstdn/tootsweekly_db.db"   
-
+    authdict_fullpath = "./authorisations/auth_dict.json"
+    with open(authdict_fullpath, "r") as f:
+        auth_dict = json.load(f)   
+    # Provide full path for the output database
+    database = "/tmp/toots_weekly_db_{}.db".format(datetime.now().astimezone(pytz.utc).strftime("%Y-%m-%d"))
+    
     dbconn = connectTo_weekly_toots_db(database)
-    toot_dir = None #"/mnt2/mstdndata/"
-    hashtag_lists_dir = "/home/ubuntu/mstdncollect/collection_hashtags/"
-    topic_lists_dir = "/home/ubuntu/mstdncollect/topiclists_iscpif/"
+    # Provide path for toot output in JSON format, else set to None to utilise the database
+    toot_dir = None
+    # Provide paths of directories that contain the hashtags lists that will be used, as well as the topic specific dictionaries
+    hashtag_lists_dir = "/home/ubuntu/PyMstdnCollect/collection_hashtags/"
+    topic_lists_dir = "/home/ubuntu/PyMstdnCollect/topiclists/"
     
     """ 
     NOTE: the dictionaries should be stored in topic_lists_dir is csv format
@@ -230,9 +231,9 @@ if __name__ == "__main__":
         Special keywords can be stored in extra_kw.csv in topic_lists_dir.
 
     """
-    topics = ["climatechange", "epidemics", "immigration"]
+    topics = ["epidemics"]
     maxdate = datetime.now(timezone.utc)
-    mindate = maxdate - timedelta(days=10)
+    mindate = maxdate - timedelta(days=7)
     daily_collection_hashtags_users(dbconn=dbconn, toot_dir=toot_dir, hashtag_lists_dir=hashtag_lists_dir, topics=topics, 
                                     topic_lists_dir=topic_lists_dir, dbtablename="toots")
     weekly_users_postcollection(sourcedir=None, mindate=mindate, maxdate=maxdate, dbconn=dbconn, 
