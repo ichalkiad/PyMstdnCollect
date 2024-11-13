@@ -127,4 +127,6 @@ for hashtaglistidx in range(1):
                             instance_name=server, allcollectedhashtags=allcollectedhashtags, print_tree=tree, dbconn=dbconn, auth_dict=auth_dict)                
 ```
 
+Please cite the following paper if you use the software in the present repository:
 
+*Chalkiadakis, Ioannis and Chavalarias, David, PyMstdnCollect: A Python Package for Data Collection on Mastodon (July 28, 2024). Available at SSRN: https://ssrn.com/abstract=4913703 or http://dx.doi.org/10.2139/ssrn.4913703*
