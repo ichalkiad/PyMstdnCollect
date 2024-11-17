@@ -22,8 +22,11 @@ from pymstdncollect.src.db import build_db_row, execute_insert_sql, execute_upda
 
 def collect_hashtag_interactions_apidirect(res, instance_name):
 
-        # convert to json        
-        fetched_toots = res.json()    
+        # convert to json       
+        try: 
+            fetched_toots = res.json()    
+        except:
+            return [], [], []
         print("Fetched {} public toots...".format(len(fetched_toots)))
         filtered_toots  = []
         collected_tags  = []
