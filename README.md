@@ -1,8 +1,8 @@
 # PyMstdnCollect
 A Python package for social science research data collection with Mastodon's public API
 
-![DOI](https://zenodo.org/badge/349102514.svg)](10.5281/zenodo.13119144)
-![Python version](https://raw.githubusercontent.com/ichalkiad/PyMstdnCollect/main/pyproject.toml)
+[![DOI](https://zenodo.org/badge/349102514.svg)](10.5281/zenodo.13119144)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 ![GitHub Actions Workflow Status](https://github.com/ichalkiad/PyMstdnCollect/actions/workflows/tests.yml/badge.svg)
 
 
@@ -127,4 +127,6 @@ for hashtaglistidx in range(1):
                             instance_name=server, allcollectedhashtags=allcollectedhashtags, print_tree=tree, dbconn=dbconn, auth_dict=auth_dict)                
 ```
 
+Please cite the following paper if you use the software in the present repository:
 
+*Chalkiadakis, Ioannis and Chavalarias, David, PyMstdnCollect: A Python Package for Data Collection on Mastodon (July 28, 2024). Available at SSRN: https://ssrn.com/abstract=4913703 or http://dx.doi.org/10.2139/ssrn.4913703*
