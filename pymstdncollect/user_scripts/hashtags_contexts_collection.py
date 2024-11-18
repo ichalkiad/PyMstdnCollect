@@ -103,9 +103,7 @@ def collect_timeline_hashtag_apidirect(hashtag=None, url=None, local=False, remo
             break
 
         filtered_toots, collected_tags, collected_users = \
-                    collect_hashtag_interactions_apidirect(r, instance_name=instance_name)
-        if len(filtered_toots)==0 and len(collected_tags) == 0 and len(collected_users) == 0:
-            continue
+                    collect_hashtag_interactions_apidirect(r, instance_name=instance_name)        
         save2json_apidirect(filtered_toots, collected_tags, collected_users, [], [], [],
                             "{}".format(savedir))
         
