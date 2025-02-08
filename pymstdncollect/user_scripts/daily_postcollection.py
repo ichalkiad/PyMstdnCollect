@@ -47,6 +47,8 @@ if __name__ == "__main__":
                                         muted boolean,
                                         instance_name text NOT NULL,
                                         toottext text,
+                                        reblogged boolean,
+                                        favourited boolean,
                                         UNIQUE(globalID, accountglobalID)
                                     ); """
     

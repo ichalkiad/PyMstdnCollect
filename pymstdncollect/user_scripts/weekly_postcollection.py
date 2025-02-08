@@ -7,7 +7,7 @@ from pymstdncollect.src.interactions import get_conversation_from_head, get_boos
 from pymstdncollect.src.db import execute_update_context_sql, build_db_row, \
                                     execute_update_reblogging_counts_sql, execute_update_reblogging_sql, \
                                         connectTo_weekly_toots_db, execute_update_reblogging_counts_sql, \
-                                            execute_insert_sql, db_row_to_json  
+                                            execute_insert_sql, db_row_to_json, execute_insert_sql, db_row_to_json, merge_sqlite_databases
 from pymstdncollect.src.toots import collect_user_postingactivity_apidirect, daily_collection_hashtags_users,\
                                         collect_users_activity_stats
 import jsonlines
@@ -217,6 +217,19 @@ if __name__ == "__main__":
     # Provide full path for the output database
     database = "/tmp/toots_weekly_db_{}.db".format(datetime.now().astimezone(pytz.utc).strftime("%Y-%m-%d"))
     
+    # collect dbs of last 10 days:
+    current_date = datetime.now().astimezone(pytz.utc)
+    date_list = []
+    for i in range(10):
+        previous_date = current_date - timedelta(days=i+1)
+        date_list.append(previous_date.strftime('%Y-%m-%d'))
+    source_dbs = ["/mnt2/dailycollects_pymstdn/{}".format(f.name) for f in os.scandir("/mnt2/dailycollects_pymstdn/") 
+                            if "toots_db_" in f.name and ".db" in f.name and "journal" not in f.name and 
+                            (f.name.split("_")[2] in date_list or f.name.split("_")[3] in date_list)]    
+    
+    merge_sqlite_databases(source_dbs, target_db=database, table_name="toots", missing_columns={"reblogged": "boolean", "favorited": "boolean"}, 
+                            default_values={"reblogged": False, "favorited": False})
+
     dbconn = connectTo_weekly_toots_db(database)
     # Provide path for toot output in JSON format, else set to None to utilise the database
     toot_dir = None

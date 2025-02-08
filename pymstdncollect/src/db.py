@@ -1,4 +1,5 @@
 import pandas as pd
+import ipdb
 import pathlib 
 import pytz
 from bs4 import BeautifulSoup
@@ -13,6 +14,201 @@ from datetime import datetime
 ###################################
 # toots db
 ###################################
+
+def get_table_columns(cursor, table_name):
+    """
+    Get column names and types for a given table.
+    """
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    
+    return {row[1]: row[2] for row in cursor.fetchall()}
+
+def get_row_count(cursor, table_name):
+    """
+    Get the total number of rows in a table.
+    """
+    
+    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+    
+    return cursor.fetchone()[0]
+
+def insert_rows_with_error_handling(cursor, table_name, rows, columns):
+    """
+    Insert rows with handling for UNIQUE constraint violations.
+    
+    Args:
+        cursor: SQLite cursor
+        table_name: Name of the target table
+        rows: List of rows to insert
+        columns: Dictionary of column names and types
+    
+    Returns:
+        tuple: (successful_inserts, failed_inserts)
+    """
+    placeholders = ','.join(['?' for _ in columns])
+    insert_sql = f"INSERT INTO {table_name} VALUES ({placeholders})"
+    
+    successful_inserts = 0
+    failed_inserts = 0
+    
+    try:
+        # First try batch insert
+        cursor.executemany(insert_sql, rows)
+        successful_inserts = len(rows)
+    except sqlite3.IntegrityError:
+        # If batch fails, try one by one
+        print("Batch insert failed. Switching to individual row processing...")
+        for row in rows:
+            try:
+                cursor.execute(insert_sql, row)
+                successful_inserts += 1
+            except sqlite3.IntegrityError:
+                failed_inserts += 1
+                if failed_inserts <= 5:  # Show only first 5 failures
+                    print(f"UNIQUE constraint failed for row: {row}")
+                elif failed_inserts == 6:
+                    print("Additional failures exist but won't be shown...")
+    
+    return successful_inserts, failed_inserts
+
+
+def merge_sqlite_databases(source_dbs, target_db, table_name, missing_columns, default_values, batch_size=5000):
+    """
+    Merge tables from multiple SQLite databases into a single database,
+    adding specified missing columns with default values.
+    
+    Args:        
+        target_db: Path to the target database file
+        table_name: Name of the table to merge
+        missing_columns: Dictionary of column names and their SQLite types to add
+        default_values: Dictionary of column names and their default values
+    """
+    start_time = datetime.now()
+    print(f"Starting merge operation at {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"\nWill add these missing columns:")
+    for col, col_type in missing_columns.items():
+        default = default_values.get(col, "NULL")
+        print(f"- {col} ({col_type}), default value: {default}")
+    
+    # Create target database
+    target_conn = sqlite3.connect(target_db)
+    target_cursor = target_conn.cursor()
+    
+    # Get list of source databases    
+    total_dbs = len(source_dbs)
+    print(f"\nFound {total_dbs} source databases to process")
+    
+    sql_create_toots_table = """ CREATE TABLE IF NOT EXISTS toots (
+                                       globalID text PRIMARY KEY,
+                                       id text NOT NULL,
+                                       accountglobalID text SECONDARY KEY,
+                                       account text NOT NULL,
+                                       created_at text NOT NULL,
+                                       in_reply_to_id text,
+                                       in_reply_to_account_id text,
+                                       sensitive boolean NOT NULL,
+                                       spoiler_text text,
+                                       spoiler_clean_text text,
+                                       visibility text NOT NULL,
+                                       language text,
+                                       uri text NOT NULL,
+                                       url text NOT NULL,
+                                       replies_count integer,
+                                       reblogs_count integer,
+                                       favourites_count integer,
+                                       edited_at text,
+                                       content text,
+                                       reblog boolean,
+                                       rebloggedbyuser text,
+                                       media_attachments text,
+                                       mentions text,
+                                       tags text,
+                                       emojis text,
+                                       card text,
+                                       poll text,
+                                       instance_name text NOT NULL,
+                                       toottext text,
+                                       muted boolean,
+                                       reblogged boolean,
+                                       favourited boolean,
+                                       UNIQUE(globalID, accountglobalID)
+                                   ); """
+    target_cursor.execute(sql_create_toots_table)
+    all_columns = get_table_columns(target_cursor, table_name)
+    # Process each database
+    total_successful = 0
+    total_failed = 0    
+    print("\nStarting data transfer...")
+    
+    for db_idx, source_db in enumerate(source_dbs, 1):
+        try:
+            source_conn = sqlite3.connect(source_db)
+            source_cursor = source_conn.cursor()
+            existing_columns = get_table_columns(source_cursor, table_name)
+            db_rows = get_row_count(source_cursor, table_name)
+            print(f"\nProcessing database {db_idx}/{total_dbs}: {source_db}")
+            print(f"Contains {db_rows:,} rows")
+            if db_rows < 1:
+                continue
+            
+            # Create SELECT statement with default values for missing columns
+            select_cols = []
+            for col in all_columns.keys():
+                if col in existing_columns:
+                    select_cols.append(col)
+                else:
+                    default_val = default_values.get(col, "NULL")
+                    if isinstance(default_val, str) and default_val.upper() != "NULL":
+                        default_val = f"'{default_val}'"
+                    select_cols.append(f"{default_val} as {col}")
+            
+            select_sql = f"SELECT {', '.join(select_cols)} FROM {table_name}"
+            source_cursor.execute(select_sql)
+            
+            # Process in batches
+            batch_count = 0
+            while True:
+                rows = source_cursor.fetchmany(batch_size)
+                if not rows:
+                    break
+                
+                successful, failed = insert_rows_with_error_handling(
+                    target_cursor, table_name, rows, all_columns
+                )
+                
+                total_successful += successful
+                total_failed += failed
+                
+                batch_count += 1
+                progress = (batch_count * batch_size / db_rows) * 100
+                print(f"Batch {batch_count}: {successful} inserted, {failed} failed - "
+                      f"Progress: {min(progress, 100):.1f}%")
+                
+                target_conn.commit()
+
+            source_conn.close()        
+            
+        except sqlite3.Error as e:
+            print(f"Error processing {source_db}: {e}")
+            continue
+    
+    # Final statistics
+    end_time = datetime.now()
+    duration = end_time - start_time
+    
+    print("\nMerge operation completed!")
+    print(f"Started: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Ended: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Duration: {duration}")
+    print(f"Successfully inserted rows: {total_successful:,}")
+    print(f"Failed inserts: {total_failed:,}")
+    print(f"Final database: {target_db}")
+    
+    # Verify final row count
+    final_count = get_row_count(target_cursor, table_name)
+    print(f"Verification: {final_count:,} rows in target database")
+    
+    target_conn.close()
 
 
 def connectTo_weekly_toots_db(dbfile):
