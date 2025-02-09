@@ -399,7 +399,7 @@ def execute_update_context_sql(dbconnection, table, headtoot, repliestoot, auth_
         parenttoot = retrieve_toot_from_id_in_toots_list(reply["in_reply_to_id"], updreplies)
         if parenttoot is None:
             parenttoot = get_toot_from_statusid(reply["in_reply_to_id"], headtoot["instance_name"], auth_dict=auth_dict)
-            if parenttoot is None:
+            if parenttoot is None or (isinstance(parenttoot, list) and len(parenttoot) == 0):
                 continue
             else:                        
                 toot = BeautifulSoup(parenttoot["content"], "html.parser")
